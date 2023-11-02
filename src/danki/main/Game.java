@@ -22,7 +22,7 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	
 	private static final long serialVersionUID = 1L;
 	public static JFrame frame;
-	private final int WIDTH = 320, HEIGHT = 320, SCALE = 2; 
+	public static final int WIDTH = 240, HEIGHT = 160, SCALE = 3; 
 	//constants frame dimensions 
 	//SCALE -> pixel effect while rendering
 	private Thread thread;

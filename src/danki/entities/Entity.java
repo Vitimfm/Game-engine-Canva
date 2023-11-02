@@ -4,12 +4,13 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import danki.main.Game;
+import danki.world.Camera;
 
 public class Entity {
 	
-	public static BufferedImage LIFEPACK_EN = Game.spritesheet.getSprite(7*16, 0, 16, 16);
-	public static BufferedImage WEAPON_EN = Game.spritesheet.getSprite(8*16, 0, 16, 16);
-	public static BufferedImage BULLETS_EN = Game.spritesheet.getSprite(9*16, 0, 16, 16);
+	public static BufferedImage LIFEPACK_EN = Game.spritesheet.getSprite(6*16, 0, 16, 16);
+	public static BufferedImage WEAPON_EN = Game.spritesheet.getSprite(7*16, 0, 16, 16);
+	public static BufferedImage BULLETS_EN = Game.spritesheet.getSprite(8*16, 0, 16, 16);
 	public static BufferedImage ENEMY_EN = Game.spritesheet.getSprite(6*16, 16, 16, 16);
 	
 	
@@ -50,6 +51,6 @@ public class Entity {
 	}
 	
 	public void render(Graphics g) {
-		g.drawImage(sprite,this.getX(), this.getY(), null);
+		g.drawImage(sprite,this.getX() - Camera.x, this.getY() - Camera.y, null);
 	}
-}
+} 
