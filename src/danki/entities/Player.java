@@ -5,11 +5,12 @@ import java.awt.image.BufferedImage;
 
 import danki.main.Game;
 import danki.world.Camera;
+import danki.world.World;
 
 public class Player extends Entity{
 	
 	public boolean right, up, down, left;
-	public double speed = 1;
+	public double speed = 2;
 
 	public int right_direction = 0, left_direction = 1;
 	public int dir = right_direction;
@@ -37,21 +38,21 @@ public class Player extends Entity{
 	
 	public void tick() {
 		moved = false;
-		if(right) {
+		if(right && World.isFree((int)(x+speed),this.getY())) {
 			moved = true;
 			dir = right_direction;
 			x += speed;
-			}
-		else if (left) {
+		}
+		else if (left && World.isFree((int)(x-speed),this.getY())) {
 			moved = true;
 			dir = left_direction;
 			x-= speed;
 		}
-		if(up) {
+		if(up && World.isFree(this.getX(), (int)(y-speed))) {
 			moved = true;
 			y -= speed;
 		}
-		else if(down) {
+		else if(down && World.isFree(this.getX(), (int)(y+speed))) {
 			moved = true;
 			y += speed;
 		}
@@ -71,6 +72,9 @@ public class Player extends Entity{
 		//centralize camera in player
 		//camera start point (0,0)
 	}
+	
+	
+	
 	public void render(Graphics g) {
 		if(dir == right_direction) {
 			g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);

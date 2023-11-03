@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import danki.entities.Entity;
 import danki.entities.Player;
 import danki.grafics.Spritesheet;
+//import danki.world.Camera;
 import danki.world.World;
 
 public class Game extends Canvas implements Runnable, KeyListener{
@@ -90,6 +91,7 @@ public class Game extends Canvas implements Runnable, KeyListener{
 			//}
 			e.tick();
 		}
+		//Camera.updateCamera();
 	}
 	
 	public void render() {
@@ -131,7 +133,8 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	    int frames = 0; //Frame counter.
 	    double timer = System.currentTimeMillis(); 
 	    //Get the current system time in milliseconds (lower precision).
-
+	    
+	    requestFocus();
 	    while (isRunning) {
 	        long now = System.nanoTime(); 
 	        //Get the current time in nanoseconds on each iteration of the loop.
