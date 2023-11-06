@@ -46,7 +46,9 @@ public class World {
 						Game.player.setY(yy*TILE_SIZE);
 						//floor under the player
 					}else if(currentPixel == 0xFFFF0000) { //Enemy
-						Game.entities.add(new Enemy(xx*TILE_SIZE, yy*TILE_SIZE, 16, 16, Entity.ENEMY_EN));
+						Enemy en = new Enemy(xx*TILE_SIZE, yy*TILE_SIZE, 16, 16, Entity.ENEMY_EN);
+						Game.entities.add(en);
+						Game.enemies.add(en);
 						
 					}else if(currentPixel == 0xFF00FFFF) { //Weapon
 						Game.entities.add(new Weapon(xx*TILE_SIZE, yy*TILE_SIZE, 16, 16, Entity.WEAPON_EN)); 
