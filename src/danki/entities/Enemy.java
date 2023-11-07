@@ -14,7 +14,7 @@ public class Enemy extends Entity{
 	
 	private double speed = 1;
 	
-	private int mask_X = 8, mask_Y = 8, maskWidth = 16, maskHeight = 16;
+	private int mask_X = 2, mask_Y = 2, maskWidth = 14, maskHeight = 14;
 	
 	private int frame = 0, maxFrames = 20, index = 0, maxIndex = 3;
 	private BufferedImage[] sprites;
@@ -34,6 +34,8 @@ public class Enemy extends Entity{
 		//mask_Y = 1; 
 		//maskWidth = 14; 
 		//maskHeight = 14;
+		if(isCollindingWithPlayer() == false) {
+			
 		if((int)x < Game.player.getX() && World.isFree((int)(x+speed), this.getY()) 
 				&& !isCollinding((int)(x+speed), this.getY())) {
 			x+=speed;
@@ -48,6 +50,15 @@ public class Enemy extends Entity{
 				&& !isCollinding(this.getX(), (int)(y-speed))) {
 			y-=speed;
 		}
+		}else {
+			// Collinding with player 
+			Player.life --;
+			if(Player.life <= 0) {
+				//Game over!
+			}
+			System.out.println("Life: " + Player.life);
+
+		}
 		
 		frame++;
 			if(frame == maxFrames) {
@@ -57,11 +68,13 @@ public class Enemy extends Entity{
 					index = 0;
 				}
 			}
-	}
+		}
+	
+	
 	public boolean isCollindingWithPlayer(){
 		Rectangle CurrentEnemy = new Rectangle(this.getX() + mask_X, this.getY() + mask_Y, maskWidth, maskHeight);
-		
-		return false;
+		Rectangle player = new Rectangle(Game.player.getX(), Game.player.getY(), 16, 16);
+		return CurrentEnemy.intersects(player);
 	}
 	
 	public boolean isCollinding(int xnext, int ynext) {

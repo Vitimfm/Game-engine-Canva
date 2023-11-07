@@ -10,6 +10,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -17,6 +18,7 @@ import danki.entities.Enemy;
 import danki.entities.Entity;
 import danki.entities.Player;
 import danki.grafics.Spritesheet;
+import danki.grafics.UI;
 //import danki.world.Camera;
 import danki.world.World;
 
@@ -40,12 +42,17 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	
 	public static Player player;
 	
+	public static Random rand;
+	
+	public UI ui;
+	
 	//Constructor
 	public Game() {
 		addKeyListener(this); //for Key Events
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		initFrame();
 		//Create objects (Right Sequence)
+		ui = new UI();
 		image = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
@@ -53,6 +60,8 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
 		entities.add(player);
 		world = new World("/map.png");
+		rand = new Random();
+
 	}
 	
 	public void initFrame() {
@@ -117,6 +126,8 @@ public class Game extends Canvas implements Runnable, KeyListener{
 			Entity e = entities.get(i);
 			e.render(g);
 		}
+		
+		ui.render(g);
 		
 		g.dispose(); //clean data in image (performace)
 		g = bs.getDrawGraphics();
