@@ -18,6 +18,10 @@ public class Enemy extends Entity{
 	
 	private int frame = 0, maxFrames = 20, index = 0, maxIndex = 3;
 	private BufferedImage[] sprites;
+	
+	private int life = 5;
+	private boolean isDamaged = false;
+	private int damageFrames = 10, damageCurrent = 0;
 
 	public Enemy(int x, int y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
@@ -52,12 +56,10 @@ public class Enemy extends Entity{
 		}
 		}else {
 			// Collinding with player 
-			Player.life --;
-			if(Player.life <= 0) {
-				//Game over!
+			if(Game.rand.nextInt(100) < 10) {
+				Game.player.life --;
+				Game.player.isDamaged = true;
 			}
-			System.out.println("Life: " + Player.life);
-
 		}
 		
 		frame++;
@@ -68,8 +70,42 @@ public class Enemy extends Entity{
 					index = 0;
 				}
 			}
+			
+			isCollidingWithBullet();
+			if(life <= 0) {
+				destroySelf();
+				return;
+			}
+			
+			if(isDamaged) {
+				this.damageCurrent++;
+				if(this.damageCurrent == this.damageFrames) {
+					this.damageCurrent = 0;
+					this.isDamaged = false;
+				}
+			}
+			
 		}
 	
+	public void destroySelf() {
+		Game.enemies.remove(this);
+		Game.entities.remove(this);
+	}
+	
+	public void isCollidingWithBullet() {
+		for(int i = 0; i < Game.bullets.size(); i++) {
+			Entity e = Game.bullets.get(i);
+			if(e instanceof BulletShoot) {
+				// Check if Bullet Shooted is collinding Enemy
+				if(Entity.isCollinding(this, e)) {
+					isDamaged = true;
+					life--;
+					Game.bullets.remove(i);
+					return;
+				}
+			}
+		}
+	}
 	
 	public boolean isCollindingWithPlayer(){
 		Rectangle CurrentEnemy = new Rectangle(this.getX() + mask_X, this.getY() + mask_Y, maskWidth, maskHeight);
@@ -94,7 +130,11 @@ public class Enemy extends Entity{
 	}
 	
 	public void render(Graphics g) {
-		g.drawImage(sprites[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
+		if(!isDamaged) {
+			g.drawImage(sprites[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
+		}else {
+			g.drawImage(Entity.ENEMY_FEEDBACK, this.getX() - Camera.x, this.getY() - Camera.y, null);
+		}	
 		// Enable Collision Mask: 
 		//g.setColor(Color.blue);
 		//g.fillRect(this.getX() + mask_X - Camera.x, this.getY() + mask_Y - Camera.y, maskWidth, maskHeight);

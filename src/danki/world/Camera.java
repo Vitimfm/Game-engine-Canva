@@ -1,12 +1,12 @@
 package danki.world;
 
-//import danki.main.Game;
+import danki.main.Game;
 
 public class Camera {
 	public static int x = 0;
 	public static int y = 0;	
 	
-	/*
+	
 	public static void updateCamera() {
         int cameraX = Camera.x;
         int cameraY = Camera.y;
@@ -39,6 +39,5 @@ public class Camera {
         Camera.x = cameraX;
         Camera.y = cameraY;
     }
-    */
 }
 

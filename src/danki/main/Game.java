@@ -3,9 +3,12 @@ package danki.main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -14,15 +17,16 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import danki.entities.BulletShoot;
 import danki.entities.Enemy;
 import danki.entities.Entity;
 import danki.entities.Player;
 import danki.grafics.Spritesheet;
 import danki.grafics.UI;
-//import danki.world.Camera;
+import danki.world.Camera;
 import danki.world.World;
 
-public class Game extends Canvas implements Runnable, KeyListener{
+public class Game extends Canvas implements Runnable, KeyListener, MouseListener{
 	
 	private static final long serialVersionUID = 1L;
 	public static JFrame frame;
@@ -32,10 +36,12 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	private Thread thread;
 	private boolean isRunning = true;
 	
+	private int CURRENT_LEVEL = 1, MAX_LEVEL = 2;
 	private BufferedImage image;
 	
 	public static List<Entity> entities;
 	public static List<Enemy> enemies;
+	public static List<BulletShoot> bullets;
 	public static Spritesheet spritesheet;
 	
 	public static World world;
@@ -49,6 +55,7 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	//Constructor
 	public Game() {
 		addKeyListener(this); //for Key Events
+		addMouseListener(this);
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		initFrame();
 		//Create objects (Right Sequence)
@@ -56,10 +63,11 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		image = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
+		bullets = new ArrayList<BulletShoot>();
 		spritesheet = new Spritesheet("/spritesheet.png");
 		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
 		entities.add(player);
-		world = new World("/map.png");
+		world = new World("/level1.png");
 		rand = new Random();
 
 	}
@@ -98,12 +106,23 @@ public class Game extends Canvas implements Runnable, KeyListener{
 	public void tick() {
 		for(int i = 0 ; i < entities.size(); i++) {
 			Entity e = entities.get(i);
-			//if(e instanceof Player) {
-				
-			//}
 			e.tick();
 		}
-		//Camera.updateCamera();
+		for(int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).tick();
+		}
+		
+		if(enemies.size() == 0) { //All enemies gone
+			//NEXT LEVEL
+			CURRENT_LEVEL++;
+			if(CURRENT_LEVEL > MAX_LEVEL) {
+				CURRENT_LEVEL = 1;
+			}
+			String newWorld = "Level" + CURRENT_LEVEL +".png"; 
+			World.restartGame(newWorld);
+		}
+		
+		Camera.updateCamera();
 	}
 	
 	public void render() {
@@ -121,10 +140,12 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		//Render Objects
 		
 		world.render(g);
-		
 		for(int i = 0 ; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			e.render(g);
+		}
+		for(int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).render(g);
 		}
 		
 		ui.render(g);
@@ -132,6 +153,11 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		g.dispose(); //clean data in image (performace)
 		g = bs.getDrawGraphics();
 		g.drawImage(image, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
+		
+		g.setFont(new Font("arial", Font.BOLD, 20));
+		g.setColor(Color.white);
+		g.drawString("Ammo: "+ player.ammo, 620, 30);
+		
 		bs.show();
 	}
 	
@@ -191,6 +217,10 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		}else if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S) {
 			player.down = true;
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_X) {
+			player.shoot = true;
+		}
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -205,5 +235,34 @@ public class Game extends Canvas implements Runnable, KeyListener{
 		}else if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S) {
 			player.down = false;
 		}
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		player.mouseShoot = true;
+		player.mouse_X = (e.getX() / 3);
+		player.mouse_Y = (e.getY() / 3);
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		
 	}
 }
