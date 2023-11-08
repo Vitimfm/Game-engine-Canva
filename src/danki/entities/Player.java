@@ -2,9 +2,9 @@ package danki.entities;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
-import danki.grafics.Spritesheet;
+//import danki.grafics.Spritesheet;
 import danki.main.Game;
 import danki.world.Camera;
 import danki.world.World;
@@ -147,7 +147,8 @@ public class Player extends Entity{
 		}
 		
 		if(life <= 0) { //Game Over
-			
+			life = 0;
+			Game.gameState = "GAME_OVER";
 		}
 		
 		Camera.x = this.getX() - (Game.WIDTH / 2);
