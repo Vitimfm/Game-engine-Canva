@@ -1,5 +1,6 @@
 package danki.entities;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 //import java.util.ArrayList;
@@ -32,8 +33,16 @@ public class Player extends Entity{
 	public double life = 100, maxLife = 100;
 	
 	public boolean shoot = false, mouseShoot = false;
-	
+		
 	public int mouse_X, mouse_Y;
+	
+	//Fake Jump Technique
+	public boolean jump = false, isJumping = false;
+	public int z = 0;
+	public int jumpHEIGHT = 50, jumpCur = 0;
+	public int jumpSpeed = 2;
+	public boolean jumpUP = false, jumpDOWN = false;
+		
 	
 	public Player(int x, int y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
@@ -54,6 +63,32 @@ public class Player extends Entity{
 	}
 	
 	public void tick() {
+		
+		if(jump) {
+			if(isJumping == false) {
+				jump = false;
+				isJumping = true;
+				jumpUP = true;
+			}
+		}
+		if(isJumping == true) {
+			if(jumpUP){
+				jumpCur += jumpSpeed;
+			}else if(jumpDOWN) {
+				jumpCur -= jumpSpeed;
+				if(jumpCur <= 0){
+					isJumping = false;
+					jumpDOWN = false;
+					jumpUP = false;
+				}
+			}
+			z = jumpCur;
+			if(jumpCur >= jumpHEIGHT) {
+				jumpUP = false;
+				jumpDOWN = true;
+			}
+		}
+		
 		moved = false;
 		if(right && World.isFree((int)(x+speed),this.getY())) {
 			moved = true;
@@ -202,18 +237,22 @@ public class Player extends Entity{
 	public void render(Graphics g) {
 		if(!isDamaged) {
 			if(dir == right_direction) {
-				g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
+				g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
 				if(hasGun) { //Gun right side
-					g.drawImage(Entity.GUN_RIGHT, this.getX() +6 - Camera.x, this.getY() + 1 - Camera.y, null);
+					g.drawImage(Entity.GUN_RIGHT, this.getX() +6 - Camera.x, this.getY() + 1 - Camera.y - z, null);
 				}
 			}else if(dir == left_direction) {
-				g.drawImage(leftPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
+				g.drawImage(leftPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
 				if(hasGun) { //Gun left side
-					g.drawImage(Entity.GUN_LEFT, this.getX() - 6 - Camera.x, this.getY() + 1 - Camera.y, null);
+					g.drawImage(Entity.GUN_LEFT, this.getX() - 6 - Camera.x, this.getY() + 1 - Camera.y - z, null);
 				}
 			}
 		}else {
-			g.drawImage(playerDamage, this.getX() - Camera.x, this.getY() - Camera.y, null);
+			g.drawImage(playerDamage, this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+		}
+		if(isJumping) {
+			g.setColor(Color.black);
+			g.fillOval(this.getX() - Camera.x + 5, this.getY() - Camera.y +8 , 8, 8);
 		}
 	}
 }

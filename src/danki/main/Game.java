@@ -81,7 +81,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	public void initFrame() {
-		frame = new JFrame("New One");
+		frame = new JFrame("SEFIAM KILLER");
 		frame.add(this);
 		frame.setResizable(false); //not resizable
 		frame.pack(); //pack after set size
@@ -261,8 +261,14 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		//diferent 'if's in case douple key pressed
 		if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
 			player.up = true;
+			if(gameState == "MENU") {
+				menu.up = true;
+			}
 		}else if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S) {
 			player.down = true;
+			if(gameState == "MENU") {
+				menu.down = true;
+			}
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_X) {
@@ -271,6 +277,28 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			this.restartGame = true;
+			if(gameState == "MENU") {
+				menu.enter = true;
+			} 
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_UP) {
+			if(gameState == "MENU") {
+				menu.up = true;
+			}
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+			if(gameState == "MENU") {
+				menu.down = true;
+			}
+		}
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			gameState = "MENU";
+			menu.pause = true;
+		}
+		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+			player.jump = true;
 		}
 	}
 
