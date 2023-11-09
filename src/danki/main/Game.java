@@ -24,49 +24,58 @@ import danki.entities.Entity;
 import danki.entities.Player;
 import danki.grafics.Spritesheet;
 import danki.grafics.UI;
-import danki.world.Camera;
 import danki.world.World;
 
 public class Game extends Canvas implements Runnable, KeyListener, MouseListener{
 	
 	private static final long serialVersionUID = 1L;
+	
+	//Frame Event 
 	public static JFrame frame;
-	public static final int WIDTH = 240, HEIGHT = 160, SCALE = 3; 
-	//constants frame dimensions 
-	//SCALE -> pixel effect while rendering
+	public static final int WIDTH = 240; 
+	public static final int HEIGHT = 160;
+	public static final int SCALE = 3; //SCALE -> pixel effect while rendering
+	
+	//Standarts 
 	private Thread thread;
 	private boolean isRunning = true;
-	
-	private int CURRENT_LEVEL = 1, MAX_LEVEL = 2;
 	private BufferedImage image;
+	public static Spritesheet spritesheet;
 	
+	//Level
+	private int CURRENT_LEVEL = 1;
+	private int MAX_LEVEL = 2;
+	
+	//Lists
 	public static List<Entity> entities;
 	public static List<Enemy> enemies;
 	public static List<BulletShoot> bullets;
-	public static Spritesheet spritesheet;
 	
+	//Init other classes
 	public static World world;
-	
 	public static Player player;
-	
 	public static Random rand;
-	
+	public Menu menu;
 	public UI ui;
 	
+	//Game State && GameOver
 	public static String gameState = "MENU";
 	private boolean showMessegeGameOver = true;
 	private int framesGameOver = 0;
 	private boolean restartGame = false;
 	
-	public Menu menu;
 	
 	//Constructor
 	public Game() {
-		addKeyListener(this); //for Key Events
+		// Listener 
+		addKeyListener(this); 
 		addMouseListener(this);
+		
+		// Frame
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		initFrame();
-		//Create objects (Right Sequence)
+		
+		// Create Objects (Right Sequence)
 		ui = new UI();
 		image = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
@@ -80,6 +89,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		menu = new Menu();
 	}
 	
+	//Standart Init Frame
 	public void initFrame() {
 		frame = new JFrame("SEFIAM KILLER");
 		frame.add(this);
@@ -90,48 +100,64 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		frame.setVisible(true);
 	}
 	
+	//THREADS -> Perform <3
+	//Thread to execute the method 'run()' in this 'Game' class
 	public synchronized void start() { 
-		thread = new Thread(this); //(this) to execute the method 'run()' in this 'Game' class
+		thread = new Thread(this); 
 		isRunning = true;
 		thread.start();
 	}
 	
+	//Stop Thread
 	public synchronized void stop() {
 		isRunning = false;
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
 	
+	//MAIN
 	public static void main(String[] args) {
 		Game game = new Game();
 		game.start();
 	}
 	
+	
 	public void tick() {
+		//GAME LOGIC / UPDATE & VERIFICATION -> Tick + Render + Run = Game Loop
+		// Organized in Game States 
+		
 		if(gameState == "NORMAL") {
-			this.restartGame = false; // In Case press ENTER when its not game over
+			
+			//In Case press ENTER when its not Game Over
+			this.restartGame = false; 
+			
+			//Start entities tick
 			for(int i = 0 ; i < entities.size(); i++) {
 				Entity e = entities.get(i);
 				e.tick();
 			}
+			//Start bullets tick
 			for(int i = 0; i < bullets.size(); i++) {
 				bullets.get(i).tick();
 			}
 			
+			//NEXT LEVEL SYSTEM
 			if(enemies.size() == 0) { //All enemies gone
-				//NEXT LEVEL
-				CURRENT_LEVEL++;
+				CURRENT_LEVEL++; //Next level
 				if(CURRENT_LEVEL > MAX_LEVEL) {
 					CURRENT_LEVEL = 1;
 				}
 				String newWorld = "Level" + CURRENT_LEVEL +".png"; 
 				World.restartGame(newWorld);
 			}
+		
+		
 		}else if(gameState == "GAME_OVER") {
+			
+			//Blink Effect
 			this.framesGameOver++;
 			if(this.framesGameOver == 30) {
 				this.framesGameOver = 0;
@@ -141,6 +167,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 					this.showMessegeGameOver = true;
 				}
 			}
+			// Reset Event
 			if(restartGame) {
 				this.restartGame = false;
 				Game.gameState = "NORMAL";
@@ -148,41 +175,45 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				String newWorld = "Level" + CURRENT_LEVEL +".png"; 
 				World.restartGame(newWorld);
 			}
+	
 		}else if(gameState == "MENU") {
 			menu.tick();
 		}
-		Camera.updateCamera();
 	}
 	
+	//Renderization of visual aspects 
 	public void render() {
 		
+		//Standart BufferStrategy (Perform)
 		BufferStrategy bs = this.getBufferStrategy();
 		if(bs == null) {
 			this.createBufferStrategy(3);
 			return;
 		}
 		
-		Graphics g = image.getGraphics();
-		g.setColor(Color.black);
-		g.fillRect(0, 0, WIDTH, HEIGHT);		
+		//Graphics Config
+		Graphics g = image.getGraphics();	
 		
-		//Render Objects
-		
+		//Classes render
 		world.render(g);
+		ui.render(g);
+		
+		//Render Entities
 		for(int i = 0 ; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			e.render(g);
 		}
+		//Render bullets
 		for(int i = 0; i < bullets.size(); i++) {
 			bullets.get(i).render(g);
 		}
 		
-		ui.render(g);
-		
+		//Frame Render Config
 		g.dispose(); //clean data in image (performace)
 		g = bs.getDrawGraphics();
 		g.drawImage(image, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
 		
+		//Ammor Score
 		g.setFont(new Font("arial", Font.BOLD, 20));
 		g.setColor(Color.white);
 		g.drawString("Ammo: "+ player.ammo, 620, 30);
@@ -201,11 +232,12 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			if(showMessegeGameOver) {
 				g.drawString("Press ENTER to restart", (WIDTH*SCALE) / 2 - 140, (HEIGHT*SCALE) / 2 + 40);
 			}
+
 		}else if(gameState == "MENU") {
 			menu.render(g);
 		}
 		
-		bs.show();
+		bs.show(); //Show pre-seted Buffered Strategy renderization 
 	}
 	
 	//GAME LOOPING ADVANCED
@@ -246,11 +278,11 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	    }
 	    stop(); //out of the game looping
 	}
-
+	
+	//KEY EVENTS
 	public void keyTyped(KeyEvent e) {
 		
 	}
-
 	public void keyPressed(KeyEvent e) {
 		
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
@@ -271,7 +303,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			}
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_X) {
+		if(e.getKeyCode() == KeyEvent.VK_R) {
 			player.shoot = true;
 		}
 		
@@ -282,17 +314,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			} 
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_UP) {
-			if(gameState == "MENU") {
-				menu.up = true;
-			}
-		}
-		
-		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-			if(gameState == "MENU") {
-				menu.down = true;
-			}
-		}
 		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			gameState = "MENU";
 			menu.pause = true;
@@ -316,31 +337,25 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		}
 	}
 
-	@Override
+	//MOUSE EVENTS 
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void mousePressed(MouseEvent e) {
 		player.mouseShoot = true;
 		player.mouse_X = (e.getX() / 3);
 		player.mouse_Y = (e.getY() / 3);
 	}
 
-	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void mouseEntered(MouseEvent e) {
 		
 	}
 
-	@Override
 	public void mouseExited(MouseEvent e) {
 		
 	}

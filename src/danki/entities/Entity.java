@@ -9,6 +9,7 @@ import danki.world.Camera;
 
 public class Entity {
 	
+	//Sprite for each Entity
 	public static BufferedImage LIFEPACK_EN = Game.spritesheet.getSprite(6*16, 0, 16, 16);
 	public static BufferedImage WEAPON_EN = Game.spritesheet.getSprite(7*16, 0, 16, 16);
 	public static BufferedImage BULLETS_EN = Game.spritesheet.getSprite(8*16, 0, 16, 16);
@@ -16,18 +17,18 @@ public class Entity {
 	public static BufferedImage GUN_LEFT = Game.spritesheet.getSprite(16, 16, 16, 16);
 	public static BufferedImage GUN_RIGHT = Game.spritesheet.getSprite(144, 0, 16, 16);
 	public static BufferedImage ENEMY_FEEDBACK = Game.spritesheet.getSprite(96, 32, 16, 16);
+	private BufferedImage sprite;
 	
-	
-	
+	//Standarts 
 	protected double x, y;
 	protected int z;
 	protected int width, height;
 	
-	private BufferedImage sprite;
-	
+	//Masks values
 	private int maskx, masky, mwidth, mheight;
 	
 	public Entity(int x, int y, int width, int height, BufferedImage sprite) {
+		//Pre-set new Entity
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -47,6 +48,7 @@ public class Entity {
 		this.mheight = mheight;
 	}
 	
+	// Information/Set Functions 
 	public void setX(int  newX) {
 		this.x = newX;
 	}
@@ -70,6 +72,7 @@ public class Entity {
 		
 	}
 	
+	//Same Collision Logic in Enemy Class (but with z axis)
 	public static boolean isCollinding(Entity e1, Entity e2){
 		Rectangle e1Mask = new Rectangle(e1.getX() + e1.maskx, e1.getY() + e1.masky, e1.mwidth, e1.mheight);
 		Rectangle e2Mask = new Rectangle(e2.getX() + e2.maskx, e2.getY() + e2.masky, e2.mwidth, e2.mheight);
@@ -80,6 +83,7 @@ public class Entity {
 	}
 	
 	public void render(Graphics g) {
+		//Render entities with camera correction
 		g.drawImage(sprite,this.getX() - Camera.x, this.getY() - Camera.y, null);
 	}
 } 

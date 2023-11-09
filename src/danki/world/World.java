@@ -13,7 +13,7 @@ import danki.main.Game;
 
 public class World {
 	
-	public static Tile[] tiles; //array of tiles 
+	public static Tile[] tiles; 
 	public static int WIDTH;
 	public static int HEIGHT;
 	public static final int TILE_SIZE = 16;
@@ -38,15 +38,16 @@ public class World {
 				for(int yy = 0; yy < HEIGHT; yy++) {
 					//Double Loop that loops through each pixel in the image
 					int currentPixel = pixels[xx + (yy * WIDTH)];
+					// save current pixel to check the Tiles
 					//(yy * WIDTH) -> vertical iteration 
 					tiles[xx + (yy * WIDTH)] = new FloorTile(xx*TILE_SIZE, yy*TILE_SIZE, Tile.TILE_FLOOR);
+					//FloorTile as standart cover 
 					
 					if(currentPixel == 0xFFFFFFFF) { // Wall
 						tiles[xx + (yy * WIDTH)] = new WallTile(xx*TILE_SIZE, yy*TILE_SIZE, Tile.TILE_WALL);	
 					}else if(currentPixel == 0xFF0094FF) { //Player
 						Game.player.setX(xx*TILE_SIZE);
 						Game.player.setY(yy*TILE_SIZE);
-						//floor under the player
 					}else if(currentPixel == 0xFFFF0000) { //Enemy
 						Enemy en = new Enemy(xx*TILE_SIZE, yy*TILE_SIZE, 16, 16, Entity.ENEMY_EN);
 						Game.entities.add(en);
@@ -61,38 +62,6 @@ public class World {
 					}else if(currentPixel == 0xFFFFD800) { //Bullets
 						Game.entities.add(new Bullets(xx*TILE_SIZE, yy*TILE_SIZE, 16, 16, Entity.BULLETS_EN));
 					}
-					
-					/*	? 				
-					switch(currentPixel) {
-					  case 0xFF000000:
-						 tiles[xx + (yy * MAP_WIDTH)] = new FloorTile(xx*16, yy*16, Tile.TILE_FLOOR);
-					     break;
-					  case 0xFFFFFFFF:
-						 tiles[xx + (yy * MAP_WIDTH)] = new FloorTile(xx*16, yy*16, Tile.TILE_WALL);
-					     break;
-					  case 0xFF0094FF: //Player
-						  
-						  Game.player.setX(xx*16);
-						  Game.player.setY(yy*16);
-						  tiles[xx + (yy * MAP_WIDTH)] = new FloorTile(xx*16, yy*16, Tile.TILE_FLOOR);
-						  //floor under the player
-						  break;
-					  case 0xFFFF0000: //Enemy
-						  Game.entities.add(new Enemy(xx*16, yy*16, 16, 16, Entity.ENEMY_EN)); 
-						  
-					  case 0xFF00FFFF: //Weapon
-						  Game.entities.add(new Weapon(xx*16, yy*16, 16, 16, Entity.WEAPON_EN)); 
-						  
-					  case 0xFF00FF21: //Lifepack 
-						  Game.entities.add(new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN));
-						  
-					  case 0xFFFFD800: //Bullets
-						  Game.entities.add(new Bullets(xx*16, yy*16, 16, 16, Entity.BULLETS_EN));
-						  
-					  default:
-						tiles[xx + (yy * MAP_WIDTH)] = new FloorTile(xx*16, yy*16, Tile.TILE_FLOOR);
-					}
-					*/
 				}
 			}
 		} catch (IOException e) {
@@ -100,23 +69,23 @@ public class World {
 		}
 	}
 	
-	//Collision with tiles walls 
+	//Collision with Tiles Walls 
 	public static boolean isFree(int xnext, int ynext) {
 		//Determine the tile coordinates for the player's next position
 		//Player's x or y + speed as a parameter of this function 
 		int EDGE = 1;
 		
-		int x1 = xnext / TILE_SIZE;  //x-coordinate of the top-left corner of the player's hitbox
-		int y1 = ynext / TILE_SIZE;  //y-coordinate of the top-left corner of the player's hitbox
+		int x1 = xnext / TILE_SIZE;  //x top-left player's hitbox
+		int y1 = ynext / TILE_SIZE;  //y top-left player's hitbox
 		
-		int x2 = (xnext + TILE_SIZE - EDGE) / TILE_SIZE; //x-coordinate of the top-right corner of the player's hitbox
-		int y2 = ynext / TILE_SIZE; //y-coordinate of the top-right corner of the player's hitbox
+		int x2 = (xnext + TILE_SIZE - EDGE) / TILE_SIZE; //x top-right player's hitbox
+		int y2 = ynext / TILE_SIZE; //y top-right player's hitbox
 		
-		int x3 = xnext / TILE_SIZE; //x-coordinate of the bottom-left corner of the player's hitbox
-		int y3 = (ynext + TILE_SIZE  - EDGE) / TILE_SIZE; //y-coordinate of the bottom-left corner of the player's hitbox
+		int x3 = xnext / TILE_SIZE; //x bottom-left player's hitbox
+		int y3 = (ynext + TILE_SIZE  - EDGE) / TILE_SIZE; //y bottom-left player's hitbox
 		
-		int x4 = (xnext + TILE_SIZE - EDGE) / TILE_SIZE; //x-coordinate of the bottom-right corner of the player's hitbox
-		int y4 = (ynext + TILE_SIZE - EDGE) / TILE_SIZE;  //y-coordinate of the bottom-right corner of the player's hitbox
+		int x4 = (xnext + TILE_SIZE - EDGE) / TILE_SIZE; //x bottom-right player's hitbox
+		int y4 = (ynext + TILE_SIZE - EDGE) / TILE_SIZE;  //y bottom-right player's hitbox
 		
 		return !((tiles[x1 + (y1 * World.WIDTH)] instanceof WallTile)||
 				(tiles[x2 + (y2 * World.WIDTH)] instanceof WallTile) ||
@@ -124,6 +93,8 @@ public class World {
 				(tiles[x4 + (y4 * World.WIDTH)] instanceof WallTile));
 	}
 	
+	//Reset Game Config
+	//Clear entities && enemies List / Init Player and World 
 	public static void restartGame(String level) {
 		Game.entities.clear();
 		Game.enemies.clear();
@@ -136,14 +107,16 @@ public class World {
 		return;
 	}
 	
-	//render every single tile
+	//Render titles in the Camera ranger
 	public void render(Graphics g) {
-		//render titles in the camera ranger
-		int xstart = Camera.x >> 4;
-		int ystart = Camera.y >> 4;
+		//Camera Position
+		//Camera.x/y / TILE_SIZE(16)
+		int xstart = Camera.x >> 4; 
+		int ystart = Camera.y >> 4;  
 		
-		int xfinal = xstart + (Game.WIDTH >> 4);
-		int yfinal = ystart + (Game.WIDTH >> 4);
+		//Camera x/y final = x/y start + Nº Tiles in the screen dimension (WIDTH/HEIGHT / TILE_SIZE)
+		int xfinal = xstart + (Game.WIDTH >> 4); 
+		int yfinal = ystart + (Game.HEIGHT >> 4);
 		
 		for(int xx = xstart; xx <= xfinal; xx++) {
 			for(int yy = ystart; yy <= yfinal; yy++) {

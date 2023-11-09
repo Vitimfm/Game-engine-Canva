@@ -9,9 +9,11 @@ import danki.world.Camera;
 
 public class BulletShoot extends Entity {
 	
+	//Directions
 	private double dx, dy;
 	private double speed = 4;
 	
+	//Life Duration
 	private int life = 30, curLife = 0;
 
 	public BulletShoot(int x, int y, int width, int height, BufferedImage sprite, double dx, double dy) {
@@ -19,7 +21,9 @@ public class BulletShoot extends Entity {
 		this.dx = dx;
 		this.dy = dy;
 	}
+	
 	public void tick() {
+		//Bullet animation and remove 
 		x += dx*speed;
 		y += dy*speed;
 		curLife++;
