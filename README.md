@@ -1,5 +1,5 @@
 ## Game Engine in Java using Canva Library
-![pei](https://github.com/Vitimfm/Java-Games-Workspace/assets/96491301/e107bb8e-7cb9-4a0a-8f84-409366ec582c)
+![Captura de tela 2023-11-13 124604](https://github.com/Vitimfm/Game-engine-Canva/assets/96491301/90da8d95-f51a-420a-9b81-7854c7bdcf81)
 <h3> Source code for 2D games using professional Game-Logic</h3>
 <h4> - Game-Looping, Collisions and Animations </h4>
 <h4> - Tick, Render and run functions </h4>
